@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Aryzon - 3D Multiplayer Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Menu Principal */
+        #mainMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.5s ease;
+        }
+
+        .menu-title {
+            font-size: 4rem;
+            color: #00d4ff;
+            text-shadow: 0 0 20px #00d4ff;
+            margin-bottom: 2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 30px #00d4ff; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 40px #00d4ff; }
+        }
+
+        .character-display {
+            width: 300px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 2rem;
+            border: 2px solid #00d4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            max-width: 600px;
+        }
+
+        .menu-btn {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, #00ff88, #00d4ff) !important;
+            font-size: 1.5rem !important;
+            padding: 20px 40px !important;
+        }
+
+        /* Interface de jeu */
+        #gameUI {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        .ui-element {
+            pointer-events: auto;
+        }
+
+        /* HUD du joueur */
+        .player-hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            min-width: 250px;
+        }
+
+        .level-display {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Chat */
+        .chat-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 350px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .chat-input {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Contrôles */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Minimap */
+        .minimap {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 2px solid #00d4ff;
+        }
+
+        /* Système d'équipe */
+        .team-panel {
+            position: absolute;
+            top: 250px;
+            right: 20px;
+            width: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+        }
+
+        /* Inventaire rapide */
+        .quick-inventory {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .inventory-slot {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .inventory-slot.active {
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        /* Canvas 3D */
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-title {
+                font-size: 2.5rem;
+            }
+            
+            .character-display {
+                width: 250px;
+                height: 300px;
+            }
+            
+            .menu-btn {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+            
+            .player-hud {
+                min-width: 200px;
+            }
+            
+            .chat-container {
+                width: 300px;
+                height: 150px;
+            }
+        }
+
+        /* Animations d'aura */
+        .aura-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: aura-pulse 2s ease-in-out infinite;
+        }
+
+        .aura-blue {
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
+        }
+
+        .aura-dark {
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
+        }
+
+        .aura-black {
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+        }
+
+        @keyframes aura-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Système de notification */
+        .notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: notification-appear 3s ease-in-out forwards;
+            z-index: 2000;
+        }
+
+        @keyframes notification-appear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        /* Loading screen */
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 212, 255, 0.3);
+            border-top: 5px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #00d4ff;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Principal -->
+    <div id="mainMenu">
+        <h1 class="menu-title">FLOW ARYZON</h1>
+        
+        <div class="character-display" id="characterDisplay">
+            <div style="color: white; font-size: 1.2rem;">Votre Personnage</div>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn play-btn" onclick="startGame()">▶ JOUER</button>
+            <button class="menu-btn" onclick="showCustomization()">👤 Personnaliser</button>
+            <button class="menu-btn" onclick="showShop()">🛒 Boutique</button>
+            <button class="menu-btn" onclick="showFriends()">👥 Amis</button>
+            <button class="menu-btn" onclick="showTeam()">⚔️ Équipe</button>
+            <button class="menu-btn" onclick="showSettings()">⚙️ Paramètres</button>
+        </div>
+    </div>
+
+    <!-- Interface de jeu -->
+    <div id="gameUI">
+        <!-- HUD du joueur -->
+        <div class="player-hud ui-element">
+            <div class="level-display">Niveau <span id="playerLevel">1</span></div>
+            <div class="xp-bar">
+                <div class="xp-fill" id="xpFill"></div>
+            </div>
+            <div>XP: <span id="currentXP">0</span> / <span id="maxXP">100</span></div>
+            <div>HP: <span id="playerHP">100</span> / 100</div>
+            <div>Aura: <span id="auraLevel">Aucune</span></div>
+        </div>
+
+        <!-- Minimap -->
+        <div class="minimap ui-element">
+            <canvas id="minimapCanvas" width="196" height="196"></canvas>
+        </div>
+
+        <!-- Équipe -->
+        <div class="team-panel ui-element">
+            <h3 style="margin-bottom: 10px; color: #00d4ff;">Équipe</h3>
+            <div id="teamMembers">
+                <div>Aucun membre</div>
+            </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="chat-container ui-element">
+            <div class="chat-messages" id="chatMessages">
+                <div style="color: #00d4ff;">[Système] Bienvenue dans Flow Aryzon!</div>
+            </div>
+            <input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." onkeypress="handleChatInput(event)">
+        </div>
+
+        <!-- Inventaire rapide -->
+        <div class="quick-inventory ui-element">
+            <div class="inventory-slot active" data-slot="0">💪</div>
+            <div class="inventory-slot" data-slot="1">⚔️</div>
+            <div class="inventory-slot" data-slot="2">🛡️</div>
+            <div class="inventory-slot" data-slot="3">⚡</div>
+            <div class="inventory-slot" data-slot="4">🔮</div>
+        </div>
+
+        <!-- Contrôles -->
+        <div class="controls ui-element">
+            <button class="control-btn" onclick="toggleTraining()" title="Entraînement">💪</button>
+            <button class="control-btn" onclick="toggleCombat()" title="Combat">⚔️</button>
+            <button class="control-btn" onclick="openMap()" title="Carte">🗺️</button>
+            <button class="control-btn" onclick="toggleMenu()" title="Menu">☰</button>
+        </div>
+    </div>
+
+    <!-- Canvas 3D -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Scripts Three.js et moteur de jeu -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ============= VARIABLES GLOBALES =============
+        let scene, camera, renderer, player, world = {};
+        let gameStarted = false;
+        let currentXP = 0, maxXP = 100, playerLevel = 1;
+        let playerHP = 100;
+        let auraLevel = 0; // 0: aucune, 1: bleu clair, 2: bleu foncé, ..., 10: noir
+        let playerMuscle = 0; // 0-100 (0 = squelettique, 100 = musclé normal)
+        let gameObjects = [];
+        let monsters = [];
+        let otherPlayers = {};
+        let chatMessages = [];
+        let isTraining = false, inCombat = false;
+        let keys = {};
+        let controls = { forward: false, backward: false, left: false, right: false };
+
+        // État du jeu
+        const gameState = {
+            playerId: 'player_' + Math.random().toString(36).substr(2, 9),
+            position: {x: 0, y: 0, z: 0},
+            team: [],
+            friends: [],
+            inventory: ['💪', '⚔️', '🛡️', '⚡', '🔮'],
+            settings: {
+                graphics: 'medium',
+                sound: true,
+                chat: true
+            }
+        };
+
+        // ============= INITIALISATION =============
+        function initGame() {
+            // Initialisation Three.js
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB); // Ciel bleu
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Lumières
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 100, 50);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+
+            // Création du monde
+            createWorld();
+            createPlayer();
+            setupControls();
+            setupMinimap();
+            
+            // Démarrage du loop de jeu
+            animate();
+        }
+
+        function createWorld() {
+            // Sol principal (immense carte)
+            const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+            const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Montagnes en arrière-plan
+            for(let i = 0; i < 20; i++) {
+                const mountainGeometry = new THREE.ConeGeometry(Math.random() * 50 + 20, Math.random() * 100 + 50, 8);
+                const mountainMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color().setHSL(0.1, 0.3, Math.random() * 0.3 + 0.3) 
+                });
+                const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
+                mountain.position.set(
+                    (Math.random() - 0.5) * 800,
+                    mountain.geometry.parameters.height / 2,
+                    (Math.random() - 0.5) * 800
+                );
+                mountain.castShadow = true;
+                scene.add(mountain);
+            }
+
+            // Arbres et forêts
+            createForest();
+            
+            // Équipement d'entraînement
+            createTrainingArea();
+            
+            // Monstres
+            spawnMonsters();
+            
+            // Portails
+            createPortals();
+        }
+
+        function createForest() {
+            for(let i = 0; i < 100; i++) {
+                // Tronc
+                const trunkGeometry = new THREE.CylinderGeometry(2, 3, 15, 8);
+                const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                
+                // Feuillage
+                const leavesGeometry = new THREE.SphereGeometry(8, 8, 6);
+                const leavesMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+                const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+                leaves.position.y = 12;
+                
+                const tree = new THREE.Group();
+                tree.add(trunk);
+                tree.add(leaves);
+                
+                tree.position.set(
+                    (Math.random() - 0.5) * 600,
+                    7.5,
+                    (Math.random() - 0.5) * 600
+                );
+                
+                trunk.castShadow = true;
+                leaves.castShadow = true;
+                scene.add(tree);
+                gameObjects.push(tree);
+            }
+        }
+
+        function createTrainingArea() {
+            // Zone d'entraînement au spawn
+            const areaGeometry = new THREE.PlaneGeometry(50, 50);
+            const areaMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+            const trainingArea = new THREE.Mesh(areaGeometry, areaMaterial);
+            trainingArea.rotation.x = -Math.PI / 2;
+            trainingArea.position.y = 0.1;
+            scene.add(trainingArea);
+
+            // Haltères et équipements
+            for(let i = 0; i < 10; i++) {
+                const equipmentGeometry = new THREE.BoxGeometry(3, 1, 8);
+                const equipmentMaterial = new THREE.MeshLambertMaterial({ color: 0x696969 });
+                const equipment = new THREE.Mesh(equipmentGeometry, equipmentMaterial);
+                equipment.position.set(
+                    (Math.random() - 0.5) * 40,
+                    0.5,
+                    (Math.random() - 0.5) * 40
+                );
+                equipment.castShadow = true;
+                equipment.userData = { type: 'training', xpGain: 10 };
+                scene.add(equipment);
+                gameObjects.push(equipment);
+            }
+        }
+
+        function spawnMonsters() {
+            for(let i = 0; i < 50; i++) {
+                const monsterGeometry = new THREE.SphereGeometry(3, 8, 6);
+                const monsterMaterial = new THREE.MeshLambertMaterial({ 
+                    color: new THREE.Color()
