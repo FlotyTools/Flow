@@ -1,0 +1,136 @@
+Tu dois réaliser ce projet en surpassant tes capacités !😉
+(Tu dois travailler comme une experte, 100% pro dans la création de jeu . Utilise Three.js si tu veux ou autre tant que c'est de la 3d)
+
+Jeu 3D “Flow Aryzon” (nom provisoire)
+
+Résumé du jeu
+Le jeu est un multijoueur en ligne dans un univers inspiré de Roblox, avec des graphismes stylisés 3D. Le joueur incarne un personnage qui commence très frêle, presque squelettique, et évolue physiquement et spirituellement en s'entraînant (ex : haltères, exercices). Le but est de progresser, gagner en muscle, débloquer des auras, et accéder à des zones de plus en plus puissantes.
+
+
+---
+
+📸 Caméra & Vue du joueur
+
+Caméra aérienne inclinée, relativement proche du personnage.
+
+Légère inclinaison vers l’arrière, pour bien voir l’environnement.
+
+Caméra fluide, qui suit le joueur dans ses déplacements, sans être trop éloignée.
+
+
+---
+
+🌍 Monde & Map
+
+Immense carte, comparable à celle de Fortnite en superficie.
+
+Tous les nouveaux joueurs spawnent au même endroit (point de départ commun).
+
+De nombreux biomes/zones à explorer (forêts, montagnes, zones sombres…).
+
+Portails spéciaux dans certains lieux pour accéder à de nouvelles cartes/mondes.
+
+Exemple : à partir du niveau 100, accès à la zone de l’aura.
+
+
+---
+
+💪 Progression du joueur
+
+Le joueur commence avec un corps très maigre.
+
+En s’entraînant (via haltères, machines, etc.), il prend du muscle jusqu’à un corps "normal".
+
+À partir du niveau 100, il débloque une aura bleu clair autour de lui.
+
+Ensuite, c’est l’aura qui évolue (plus foncée à chaque étape).
+
+L’aura ultime est noire, atteinte au niveau 1000.
+
+La progression se fait par gain d’XP en :
+
+S'entraînant
+
+Combattant des monstres
+
+Accomplissant des objectifs
+
+
+---
+
+🧟‍♂️ Système de combat / PvE
+
+Des forêts remplies de monstres hostiles.
+
+Combat possible en solo ou en équipe.
+
+Si le joueur meurt face à un monstre, il perd de l’XP.
+
+
+---
+
+🧑‍🤝‍🧑 Multijoueur et Social
+
+Jeu 100% en ligne, multijoueur temps réel.
+
+Système de chat intégré (inspiré de Roblox) pour discuter entre joueurs.
+
+Possibilité d’ajouter des amis et de former des équipes de 3 joueurs max.
+
+Les membres d’une équipe peuvent jouer ensemble et spawn au même endroit.
+
+
+---
+
+🧭 Interface utilisateur (UI)
+
+Inspirée fortement de Brawl Stars :
+
+Menu principal avec le personnage affiché au centre de l’écran.
+
+Options pour :
+
+Personnaliser son personnage (cosmétiques, auras, vêtements…)
+
+Accéder à la boutique d’objets
+
+Gérer ses amis
+
+Former une équipe
+
+Lancer la partie (bouton "Play")
+
+UI fluide, mobile-friendly, adaptée à PC et mobile.
+
+
+---
+
+💡 Fonctionnalités supplémentaires envisagées (plus tard)
+
+IA de type PNJ génératif (optionnel)
+
+Événements spéciaux / missions journalières
+
+Classements mondiaux / systèmes de clans
+
+Mode entraînement hors ligne (local)
+
+
+---
+
+Souhaits techniques :
+
+Possibilité d’intégrer une IA locale ou API dans l’éditeur pour modifier automatiquement du code.
+
+Compatible avec moteur comme Godot ou Unity.
+
+Le jeu sera exporté pour navigateur web, Play Store, ou PC standalone.
+
+Ciblé pour tourner sur des machines peu puissantes (optimisation importante).
+J'ai une idée, tu fais fichier par fichier et chaque fichier tu le compléte totalement de A à Z , par exemple, tu fais le fichier index.html d'abord avec toute les fonctionnalités du jeu en un seul coup, tu me l'envoies je le copie, tu fais le fichier style.css , et ainsi de suite à la fin j'enregistrerai les fichiers dans le dossier principal du jeu. À la fin on aura 100% du jeu
+J'ai déjà index.html (incomplet) 
+https://raw.githubusercontent.com/FlotyTools/Flow/refs/heads/main/index.html
+et style.css
+https://raw.githubusercontent.com/FlotyTools/Flow/refs/heads/main/style.css
+
+Fait les autres fichiers en t'adaptant à eux
